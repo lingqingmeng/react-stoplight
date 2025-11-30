@@ -3,7 +3,7 @@ import { cpSync, mkdirSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const outdir = resolve('dist');
-const staticDir = resolve('static');
+const staticDir = resolve('public');
 
 const refreshStatic = () => {
   rmSync(outdir, { recursive: true, force: true });

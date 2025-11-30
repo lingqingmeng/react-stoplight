@@ -3,7 +3,7 @@ import { cpSync, mkdirSync, rmSync, watch } from 'node:fs';
 import { resolve } from 'node:path';
 
 const outdir = resolve('dist');
-const staticDir = resolve('static');
+const staticDir = resolve('public');
 
 const refreshStatic = () => {
   rmSync(outdir, { recursive: true, force: true });
@@ -42,10 +42,12 @@ const ctx = await context({
 
 await ctx.watch();
 
-const { host, port } = await ctx.serve({
+let { host, port } = await ctx.serve({
   servedir: outdir,
   port: 5173
 });
+
+host = host || 'localhost';
 
 console.log(`Dev server ready at http://${host}:${port}`);
 
