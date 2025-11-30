@@ -1,65 +1,59 @@
-#!/usr/bin/env node
-import { context } from "esbuild";
-import { mkdir, rm } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
-import { spawn } from "node:child_process";
+import { context } from 'esbuild';
+import { cpSync, mkdirSync, rmSync, watch } from 'node:fs';
+import { resolve } from 'node:path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const projectRoot = resolve(__dirname, "..");
-const outdir = resolve(projectRoot, "public/assets");
-const entryPoints = [resolve(projectRoot, "src/main.tsx")];
-const port = Number(process.env.PORT ?? 4173);
+const outdir = resolve('dist');
+const staticDir = resolve('static');
 
-await rm(outdir, { recursive: true, force: true });
-await mkdir(outdir, { recursive: true });
+const refreshStatic = () => {
+  rmSync(outdir, { recursive: true, force: true });
+  mkdirSync(outdir, { recursive: true });
+  cpSync(staticDir, outdir, { recursive: true });
+};
+
+refreshStatic();
+
+watch(staticDir, { recursive: true }, () => {
+  try {
+    refreshStatic();
+    console.log('Static assets refreshed.');
+  } catch (error) {
+    console.error('Failed to refresh static assets:', error);
+  }
+});
 
 const ctx = await context({
-  entryPoints,
+  entryPoints: ['src/main.tsx'],
   bundle: true,
-  format: "esm",
-  sourcemap: true,
-  target: "es2018",
   outdir,
+  entryNames: '[name]',
+  format: 'esm',
+  target: ['es2020'],
+  sourcemap: true,
+  jsx: 'automatic',
   loader: {
-    ".ts": "ts",
-    ".tsx": "tsx",
-    ".css": "css",
+    '.ts': 'ts',
+    '.tsx': 'tsx'
   },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('development')
+  }
 });
 
 await ctx.watch();
-console.log("⚡ esbuild watching for changes...");
 
-const httpServerBin = resolve(projectRoot, "node_modules/http-server/bin/http-server.js");
-const server = spawn(process.execPath, [httpServerBin, "public", "-c-1", "-p", String(port)], {
-  cwd: projectRoot,
-  stdio: "inherit",
+const { host, port } = await ctx.serve({
+  servedir: outdir,
+  port: 5173
 });
 
-server.on("exit", async (code) => {
-  await ctx.dispose();
-  if (code !== null) {
-    process.exit(code);
-  }
-});
-
-console.log(`\nServing public/ at http://localhost:${port}\nPress Ctrl+C to stop.`);
+console.log(`Dev server ready at http://${host}:${port}`);
 
 const shutdown = async () => {
   await ctx.dispose();
-  if (!server.killed) {
-    server.kill();
-  }
+  process.exit(0);
 };
 
-process.on("SIGINT", async () => {
-  await shutdown();
-  process.exit(0);
-});
-
-process.on("SIGTERM", async () => {
-  await shutdown();
-  process.exit(0);
-});
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
 

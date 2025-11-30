@@ -1,32 +1,36 @@
-#!/usr/bin/env node
-import { build } from "esbuild";
-import { cp, mkdir, rm } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
+import { build } from 'esbuild';
+import { cpSync, mkdirSync, rmSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const projectRoot = resolve(__dirname, "..");
-const distDir = resolve(projectRoot, "dist");
-const publicDir = resolve(projectRoot, "public");
+const outdir = resolve('dist');
+const staticDir = resolve('static');
 
-await rm(distDir, { recursive: true, force: true });
-await mkdir(distDir, { recursive: true });
-await cp(publicDir, distDir, { recursive: true });
+const refreshStatic = () => {
+  rmSync(outdir, { recursive: true, force: true });
+  mkdirSync(outdir, { recursive: true });
+  cpSync(staticDir, outdir, { recursive: true });
+};
+
+refreshStatic();
 
 await build({
-  entryPoints: [resolve(projectRoot, "src/main.tsx")],
+  entryPoints: ['src/main.tsx'],
   bundle: true,
-  format: "esm",
+  outdir,
+  entryNames: '[name]',
+  format: 'esm',
+  target: ['es2020'],
   minify: true,
-  sourcemap: true,
-  target: "es2018",
-  outdir: resolve(distDir, "assets"),
+  sourcemap: false,
+  jsx: 'automatic',
   loader: {
-    ".ts": "ts",
-    ".tsx": "tsx",
-    ".css": "css",
+    '.ts': 'ts',
+    '.tsx': 'tsx'
   },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('production')
+  }
 });
 
-console.log("✅ Build complete. Files emitted to dist/");
+console.log('Build complete ➜ dist/');
 
