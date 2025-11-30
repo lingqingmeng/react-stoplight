@@ -1,5 +1,5 @@
 {
-  "name": "stoplight",
+  "name": "react-stoplight",
   "version": "1.0.0",
   "description": "Minimal React + TypeScript scaffold powered by esbuild.",
   "main": "index.js",
