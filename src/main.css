@@ -17,5 +17,29 @@
   border-radius: 50%; /* Makes the div a circle */
   background-color: #555; /* Default "off" color */
   transition: background-color 0.3s, box-shadow 0.3s;
-  cursor: pointer;
+}
+
+/* Active States */
+.light.red {
+  background-color: #4a1f1f;
+}
+
+.light.yellow {
+  background-color: #4a3c14;
+}
+
+.light.green {
+  background-color: #1d3f2a;
+}
+
+.light.red.active {
+  background-color: #ff8a8a;
+}
+
+.light.yellow.active {
+  background-color: #ffe45c;
+}
+
+.light.green.active {
+  background-color: #63ff83;
 }

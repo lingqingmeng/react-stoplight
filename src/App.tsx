@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Stoplight from "./Stoplight";
 
 const App = () => {
   return (
