@@ -1,0 +1,33 @@
+{
+  "name": "stoplight",
+  "version": "1.0.0",
+  "description": "Minimal React + TypeScript scaffold powered by esbuild.",
+  "main": "index.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "esbuild"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "esbuild": "^0.27.0",
+    "http-server": "^14.1.1",
+    "typescript": "^5.9.3"
+  }
+}
+
